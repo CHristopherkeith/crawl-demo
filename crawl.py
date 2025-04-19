@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import random
+import csv
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
@@ -32,6 +33,15 @@ def parse_books(html):
         })
     return books
 
+def save_to_csv(books, filename='douban_books.csv'):
+    """将爬取的图书信息保存到CSV文件"""
+    with open(filename, 'w', newline='', encoding='utf-8-sig') as f:
+        fieldnames = ['title', 'info', 'rating', 'quote']
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(books)
+    print(f"数据已保存到 {filename}，共 {len(books)} 条记录")
+
 def crawl_all():
     all_books = []
     for page in range(2):  # 每页 25 本，共 10 页
@@ -45,3 +55,5 @@ if __name__ == "__main__":
     book_list = crawl_all()
     for book in book_list[:10]:  # 打印前 10 本书看看
         print(f"{book['title']} | {book['info']} | {book['rating']}分 | {book['quote']}")
+    # 保存到CSV文件
+    save_to_csv(book_list)
